@@ -1,0 +1,784 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation & Report | Vast Electrical Solutions</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #121212;
+            color: #222222;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            padding: 40px 20px;
+        }
+
+        /* Fullscreen Security Overlay */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f141c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-box {
+            background: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .auth-box h2 {
+            color: #00E5FF;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .auth-box p {
+            font-size: 0.85rem;
+            color: #888888;
+            margin-bottom: 20px;
+        }
+
+        .auth-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        .auth-error {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .controls-bar {
+            max-width: 850px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #181818;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .controls-bar p {
+            font-size: 0.85rem;
+            color: #00E5FF;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background-color: #B87333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-action:hover {
+            opacity: 0.85;
+        }
+
+        .btn-secondary {
+            background-color: #333333;
+        }
+
+        /* Exact Document Layout Matching Image */
+        .quote-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        [contenteditable="true"] {
+            outline: 1px dashed rgba(0, 102, 204, 0.3);
+            outline-offset: 2px;
+            border-radius: 2px;
+            transition: outline 0.2s ease;
+        }
+
+        [contenteditable="true"]:hover {
+            outline: 1px solid rgba(0, 102, 204, 0.7);
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 2px solid #0066CC;
+            background: rgba(0, 102, 204, 0.02);
+        }
+
+        /* Header Section */
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #004488;
+            padding-bottom: 15px;
+            margin-bottom: 12px;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo-container {
+            width: 140px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: -15px;
+            margin-bottom: -15px;
+        }
+
+        .brand-logo {
+            width: 140px;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-info {
+            border-left: 2px solid #004488;
+            padding-left: 12px;
+        }
+
+        .brand-info h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .brand-info h2 {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #004488;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .brand-info p {
+            font-size: 0.68rem;
+            color: #444444;
+            line-height: 1.2;
+        }
+
+        .doc-title-area {
+            text-align: right;
+        }
+
+        .doc-title-area h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #111111;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .meta-table {
+            font-size: 0.72rem;
+            color: #333333;
+            text-align: right;
+        }
+
+        .meta-table td {
+            padding: 2px 0 2px 10px;
+            border: none;
+        }
+
+        /* Top Blue Boxes Grid */
+        .top-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .blue-card {
+            background-color: #F0F4F8;
+            border: 1px solid #D0DCED;
+            border-radius: 4px;
+            padding: 10px 14px;
+        }
+
+        .blue-card-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #004488;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .blue-card p {
+            font-size: 0.75rem;
+            color: #222222;
+            margin-bottom: 2px;
+        }
+
+        /* Project Scope Full Width Card */
+        .project-scope-card {
+            background-color: #F0F4F8;
+            border: 1px solid #D0DCED;
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+        }
+
+        .project-scope-card p {
+            font-size: 0.75rem;
+            color: #333333;
+        }
+
+        /* Items Table */
+        .table-container {
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            background: #112244;
+            padding: 8px 12px;
+            border: none;
+        }
+
+        td {
+            padding: 10px 12px;
+            font-size: 0.78rem;
+            border-bottom: 1px solid #E5E5E5;
+            color: #222222;
+            vertical-align: middle;
+        }
+
+        td.item-desc span {
+            display: block;
+            font-size: 0.7rem;
+            color: #666666;
+            margin-top: 2px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: #cc0000;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .btn-delete:hover {
+            background: rgba(204, 0, 0, 0.1);
+        }
+
+        .add-row-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add {
+            background: transparent;
+            border: 1px dashed #999999;
+            color: #555555;
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            border-color: #004488;
+            color: #004488;
+        }
+
+        /* Bottom Grid: Banking & Totals */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: start;
+        }
+
+        .totals-table {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.78rem;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            color: #555555;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .total-row.final {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #FFFFFF;
+            background: #112244;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        /* Sign-off & Footer */
+        .signoff-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid #DDDDDD;
+            padding-top: 20px;
+            font-size: 0.75rem;
+        }
+
+        .client-acceptance p {
+            font-weight: 700;
+            color: #111111;
+            margin-bottom: 25px;
+        }
+
+        .signature-line {
+            width: 250px;
+            border-bottom: 1px solid #666666;
+            margin-bottom: 4px;
+        }
+
+        .issued-box {
+            text-align: right;
+            font-size: 0.72rem;
+            color: #333333;
+        }
+
+        .issued-box p {
+            margin-bottom: 2px;
+        }
+
+        .footer-banner {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #666666;
+            border-top: 1px solid #E5E5E5;
+            padding-top: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        @media print {
+            #auth-overlay, .controls-bar, .btn-delete, .btn-add {
+                display: none !important;
+            }
+            body {
+                background-color: #FFFFFF;
+                padding: 0;
+            }
+            .quote-container {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            [contenteditable="true"] {
+                outline: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Secure Login Overlay -->
+<div id="auth-overlay">
+    <div class="auth-box">
+        <h2>Restricted Access</h2>
+        <p>Enter admin password to unlock tool.</p>
+        <input type="password" id="password-input" placeholder="Password" autofocus>
+        <div id="auth-error" class="auth-error">Incorrect password. Access denied.</div>
+        <button id="unlock-btn" class="btn-action" style="width: 100%;">Unlock Tool</button>
+    </div>
+</div>
+
+<!-- Control Bar -->
+<div class="controls-bar">
+    <p>💡 Click any text, cards, or numbers below to edit or add/remove items dynamically.</p>
+    <div class="button-group">
+        <a href="index.html" class="btn-action btn-secondary">Home</a>
+        <button class="btn-action btn-secondary" onclick="toggleItemsSection()">Toggle Items</button>
+        <button class="btn-action btn-secondary" onclick="toggleBanking()">Toggle Banking</button>
+        <button class="btn-action btn-secondary" onclick="toggleTotals()">Toggle Totals</button>
+        <button class="btn-action btn-secondary" onclick="location.reload()">Reset</button>
+        <button class="btn-action" onclick="window.print()">Print / Save PDF</button>
+    </div>
+</div>
+
+<div class="quote-container">
+    <!-- Header -->
+    <div class="doc-header">
+        <div class="brand-wrapper">
+            <div class="brand-logo-container">
+                <img src="./images/veslogo.png" alt="Vast Electrical Solutions Logo" class="brand-logo">
+            </div>
+            <div class="brand-info">
+                <h1 contenteditable="true">VAST ELECTRICAL SOLUTIONS</h1>
+                <h2 contenteditable="true">HIGH-END ELECTRICAL & RENEWABLE ENERGY ENGINEERING</h2>
+                <p contenteditable="true">Phone: +27 83 340 6875 | Email: vastelectricalsol@gmail.com</p>
+                <p contenteditable="true">Region: Cape Province</p>
+            </div>
+        </div>
+        <div class="doc-title-area">
+            <h2 contenteditable="true">QUOTATION</h2>
+            <table class="meta-table">
+                <tr>
+                    <td><strong>Quote No:</strong></td>
+                    <td><span contenteditable="true">VES-2026-0842</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Date:</strong></td>
+                    <td><span contenteditable="true">August 18, 2026</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Valid For:</strong></td>
+                    <td><span contenteditable="true">14 Days</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top Blue Cards Grid -->
+    <div class="top-info-grid">
+        <div class="blue-card">
+            <div class="blue-card-title">Client & Installation Location</div>
+            <p><strong contenteditable="true">[CLIENT NAME]</strong></p>
+            <p><span contenteditable="true">[STREET ADDRESS]</span></p>
+            <p><span contenteditable="true">[CITY, POSTAL CODE]</span></p>
+            <p><span contenteditable="true">Western Cape</span></p>
+        </div>
+        <div class="blue-card">
+            <div class="blue-card-title">System Design Specification</div>
+            <p><span contenteditable="true">• [SYSTEM CAPACITY / SPECIFICATION]</span></p>
+            <p><span contenteditable="true">• [SYSTEM TYPE / DETAILS]</span></p>
+            <p><span contenteditable="true">• [INTEGRATION & PROTECTION SCOPE]</span></p>
+        </div>
+    </div>
+
+    <!-- Project Scope & Summary Card (Dynamic Report / Cards Section) -->
+    <div class="project-scope-card">
+        <div class="blue-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Project Scope & Summary</span>
+            <button class="btn-add" onclick="addReportCard()" style="padding: 2px 6px; font-size: 0.65rem;">+ Add Note Section</button>
+        </div>
+        <div id="report-sections" style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <p contenteditable="true" style="flex: 1;">[Insert overall project description, scope of work, and commissioning summary here...]</p>
+                <button class="btn-delete" onclick="deleteReportCard(this)" title="Remove section">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items Table Section Wrapper -->
+    <div id="items-section-wrapper">
+        <!-- Line Items Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description & Specifications</th>
+                        <th class="text-right" style="width: 70px;">Qty</th>
+                        <th class="text-right" style="width: 120px;">Total Amount</th>
+                        <th style="width: 40px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="line-items">
+                    <tr>
+                        <td class="item-desc">
+                            <strong contenteditable="true">[Item 1 Title]</strong>
+                            <span contenteditable="true">[Detailed specification and hardware inclusion notes]</span>
+                        </td>
+                        <td class="text-right" contenteditable="true" oninput="calculateTotals()">1</td>
+                        <td class="text-right row-total">R 0.00</td>
+                        <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
+                    </tr>
+                    <tr>
+                        <td class="item-desc">
+                            <strong contenteditable="true">[Item 2 Title]</strong>
+                            <span contenteditable="true">[Detailed specification and hardware inclusion notes]</span>
+                        </td>
+                        <td class="text-right" contenteditable="true" oninput="calculateTotals()">1</td>
+                        <td class="text-right row-total">R 0.00</td>
+                        <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Item / Clear Buttons -->
+        <div class="add-row-container">
+            <button class="btn-add" onclick="addNewRow()">+ Add Line Item</button>
+            <button class="btn-add" onclick="clearAllRows()" style="border-color: rgba(204,0,0,0.3); color: #cc0000;">Clear All Items</button>
+        </div>
+    </div>
+
+    <!-- Bottom Grid: Banking & Totals -->
+    <div class="bottom-grid">
+        <div id="banking-section" class="blue-card" contenteditable="true">
+            <div class="blue-card-title">Banking & Payment Details</div>
+            <p><strong>Bank:</strong> Absa Bank</p>
+            <p><strong>Account Name:</strong> Vast Electrical Solutions</p>
+            <p><strong>Account Number:</strong> 4117262414 | <strong>Branch Code:</strong> 632005</p>
+            <p><strong>Reference:</strong> [QUOTE NO] / [CLIENT SURNAME]</p>
+            <p style="margin-top: 6px; font-size: 0.7rem; color: #555555;">• 50% deposit required on acceptance; balance on completion.<br>• 12-month installation & workmanship guarantee included.</p>
+        </div>
+
+        <div id="totals-section">
+            <div class="totals-table">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal-val">R 0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>VAT @ 15%</span>
+                    <span id="vat-val">R 0.00</span>
+                </div>
+                <div class="total-row final">
+                    <span>TOTAL ZAR</span>
+                    <span id="total-val">R 0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign-off Section -->
+    <div class="signoff-section">
+        <div class="client-acceptance">
+            <p contenteditable="true">Client Acceptance Signature:</p>
+            <div class="signature-line"></div>
+            <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 4px;">Date: ________________________</p>
+        </div>
+        <div class="issued-box">
+            <p contenteditable="true"><strong>Issued By:</strong> Vast Electrical Solutions</p>
+            <p contenteditable="true">Master Electrician / Solar Specialist</p>
+        </div>
+    </div>
+
+    <div class="footer-banner" contenteditable="true">
+        Vast Electrical Solutions • Certified High-Quality Installations & Renewable Energy Engineering • Cape Province
+    </div>
+</div>
+
+<script>
+    function checkPassword() {
+        const input = document.getElementById('password-input').value;
+        const errorDiv = document.getElementById('auth-error');
+        const overlay = document.getElementById('auth-overlay');
+
+        if (input === "Vast2026!") {
+            overlay.style.display = 'none';
+        } else {
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    // Attach event listeners safely when document is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        const unlockBtn = document.getElementById('unlock-btn');
+        const passwordInput = document.getElementById('password-input');
+
+        if (unlockBtn) {
+            unlockBtn.addEventListener('click', checkPassword);
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        }
+    });
+
+    function toggleItemsSection() {
+        const itemsEl = document.getElementById('items-section-wrapper');
+        if (itemsEl.style.display === 'none') {
+            itemsEl.style.display = 'block';
+        } else {
+            itemsEl.style.display = 'none';
+        }
+    }
+
+    function toggleBanking() {
+        const bankingEl = document.getElementById('banking-section');
+        if (bankingEl.style.display === 'none') {
+            bankingEl.style.display = 'block';
+        } else {
+            bankingEl.style.display = 'none';
+        }
+    }
+
+    function toggleTotals() {
+        const totalsEl = document.getElementById('totals-section');
+        if (totalsEl.style.display === 'none') {
+            totalsEl.style.display = 'block';
+        } else {
+            totalsEl.style.display = 'none';
+        }
+    }
+
+    function formatCurrency(amount) {
+        return 'R ' + amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calculateTotals() {
+        const rows = document.querySelectorAll('#line-items tr');
+        let subtotal = 0;
+
+        rows.forEach(row => {
+            const qtyCell = row.cells[1];
+            const totalCell = row.cells[2];
+
+            if (qtyCell && totalCell) {
+                const qty = parseFloat(qtyCell.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                const rowTotal = qty; 
+
+                totalCell.innerText = formatCurrency(rowTotal);
+                subtotal += rowTotal;
+            }
+        });
+
+        const vat = subtotal * 0.15;
+        const grandTotal = subtotal + vat;
+
+        document.getElementById('subtotal-val').innerText = formatCurrency(subtotal);
+        document.getElementById('vat-val').innerText = formatCurrency(vat);
+        document.getElementById('total-val').innerText = formatCurrency(grandTotal);
+    }
+
+    function addNewRow() {
+        const tbody = document.getElementById('line-items');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td class="item-desc">
+                <strong contenteditable="true">[New Item Title]</strong>
+                <span contenteditable="true">[Detailed specification notes]</span>
+            </td>
+            <td class="text-right" contenteditable="true" oninput="calculateTotals()">0.00</td>
+            <td class="text-right row-total">R 0.00</td>
+            <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
+        `;
+        tbody.appendChild(newRow);
+        calculateTotals();
+    }
+
+    function deleteRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        calculateTotals();
+    }
+
+    function clearAllRows() {
+        if (confirm("Are you sure you want to clear all line items?")) {
+            document.getElementById('line-items').innerHTML = '';
+            calculateTotals();
+        }
+    }
+
+    function addReportCard() {
+        const container = document.getElementById('report-sections');
+        const newDiv = document.createElement('div');
+        newDiv.style.display = 'flex';
+        newDiv.style.justifyContent = 'space-between';
+        newDiv.style.alignItemsMargin = 'center';
+        newDiv.innerHTML = `
+            <p contenteditable="true" style="flex: 1;">[Additional project scope or inspection note...]</p>
+            <button class="btn-delete" onclick="deleteReportCard(this)" title="Remove section">✕</button>
+        `;
+        container.appendChild(newDiv);
+    }
+
+    function deleteReportCard(button) {
+        const item = button.closest('div');
+        item.removes = item.remove();
+    }
+
+    window.onload = function() {
+        calculateTotals();
+    };
+</script>
+
+</body>
+</html>
