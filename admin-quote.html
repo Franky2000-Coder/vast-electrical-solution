@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -537,7 +537,7 @@
         </div>
     </div>
 
-    <!-- Project Scope & Summary Card (Dynamic Report / Cards Section) -->
+    <!-- Project Scope & Summary Card -->
     <div class="project-scope-card">
         <div class="blue-card-title" style="display: flex; justify-content: space-between; align-items: center;">
             <span>Project Scope & Summary</span>
@@ -553,7 +553,6 @@
 
     <!-- Line Items Table Section Wrapper -->
     <div id="items-section-wrapper">
-        <!-- Line Items Table -->
         <div class="table-container">
             <table>
                 <thead>
@@ -654,7 +653,6 @@
         }
     }
 
-    // Attach event listeners safely when document is ready
     document.addEventListener('DOMContentLoaded', () => {
         const unlockBtn = document.getElementById('unlock-btn');
         const passwordInput = document.getElementById('password-input');
@@ -674,29 +672,17 @@
 
     function toggleItemsSection() {
         const itemsEl = document.getElementById('items-section-wrapper');
-        if (itemsEl.style.display === 'none') {
-            itemsEl.style.display = 'block';
-        } else {
-            itemsEl.style.display = 'none';
-        }
+        itemsEl.style.display = itemsEl.style.display === 'none' ? 'block' : 'none';
     }
 
     function toggleBanking() {
         const bankingEl = document.getElementById('banking-section');
-        if (bankingEl.style.display === 'none') {
-            bankingEl.style.display = 'block';
-        } else {
-            bankingEl.style.display = 'none';
-        }
+        bankingEl.style.display = bankingEl.style.display === 'none' ? 'block' : 'none';
     }
 
     function toggleTotals() {
         const totalsEl = document.getElementById('totals-section');
-        if (totalsEl.style.display === 'none') {
-            totalsEl.style.display = 'block';
-        } else {
-            totalsEl.style.display = 'none';
-        }
+        totalsEl.style.display = totalsEl.style.display === 'none' ? 'block' : 'none';
     }
 
     function formatCurrency(amount) {
@@ -762,7 +748,7 @@
         const newDiv = document.createElement('div');
         newDiv.style.display = 'flex';
         newDiv.style.justifyContent = 'space-between';
-        newDiv.style.alignItemsMargin = 'center';
+        newDiv.style.alignItems = 'center';
         newDiv.innerHTML = `
             <p contenteditable="true" style="flex: 1;">[Additional project scope or inspection note...]</p>
             <button class="btn-delete" onclick="deleteReportCard(this)" title="Remove section">✕</button>
@@ -772,7 +758,9 @@
 
     function deleteReportCard(button) {
         const item = button.closest('div');
-        item.removes = item.remove();
+        if (item) {
+            item.remove();
+        }
     }
 
     window.onload = function() {
