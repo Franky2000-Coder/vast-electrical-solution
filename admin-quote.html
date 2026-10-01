@@ -131,7 +131,7 @@
             background-color: #333333;
         }
 
-        /* Exact Document Layout Matching Image */
+        /* Exact Document Layout */
         .quote-container {
             max-width: 850px;
             margin: 0 auto;
@@ -384,6 +384,7 @@
         .total-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             color: #555555;
             padding-bottom: 4px;
             border-bottom: 1px solid #E5E5E5;
@@ -470,19 +471,20 @@
         <p>Enter admin password to unlock tool.</p>
         <input type="password" id="password-input" placeholder="Password" autofocus>
         <div id="auth-error" class="auth-error">Incorrect password. Access denied.</div>
-        <button id="unlock-btn" class="btn-action" style="width: 100%;">Unlock Tool</button>
+        <button onclick="checkPassword()" class="btn-action" style="width: 100%;">Unlock Tool</button>
     </div>
 </div>
 
 <!-- Control Bar -->
 <div class="controls-bar">
-    <p>💡 Click any text, cards, or numbers below to edit or add/remove items dynamically.</p>
+    <p>💡 Click any UOM, Qty, Unit Price, or Total to edit. Totals auto-calculate or accept manual overrides!</p>
     <div class="button-group">
         <a href="index.html" class="btn-action btn-secondary">Home</a>
+        <button class="btn-action btn-secondary" onclick="toggleScope()">Toggle Scope</button>
         <button class="btn-action btn-secondary" onclick="toggleItemsSection()">Toggle Items</button>
         <button class="btn-action btn-secondary" onclick="toggleBanking()">Toggle Banking</button>
         <button class="btn-action btn-secondary" onclick="toggleTotals()">Toggle Totals</button>
-        <button class="btn-action btn-secondary" onclick="location.reload()">Reset</button>
+        <button class="btn-action btn-secondary" onclick="resetForm()">Reset</button>
         <button class="btn-action" onclick="window.print()">Print / Save PDF</button>
     </div>
 </div>
@@ -538,7 +540,7 @@
     </div>
 
     <!-- Project Scope & Summary Card -->
-    <div class="project-scope-card">
+    <div id="scope-section-wrapper" class="project-scope-card">
         <div class="blue-card-title" style="display: flex; justify-content: space-between; align-items: center;">
             <span>Project Scope & Summary</span>
             <button class="btn-add" onclick="addReportCard()" style="padding: 2px 6px; font-size: 0.65rem;">+ Add Note Section</button>
@@ -558,7 +560,9 @@
                 <thead>
                     <tr>
                         <th>Description & Specifications</th>
+                        <th style="width: 70px;">UOM</th>
                         <th class="text-right" style="width: 70px;">Qty</th>
+                        <th class="text-right" style="width: 110px;">Unit Price</th>
                         <th class="text-right" style="width: 120px;">Total Amount</th>
                         <th style="width: 40px;"></th>
                     </tr>
@@ -569,8 +573,10 @@
                             <strong contenteditable="true">[Item 1 Title]</strong>
                             <span contenteditable="true">[Detailed specification and hardware inclusion notes]</span>
                         </td>
-                        <td class="text-right" contenteditable="true" oninput="calculateTotals()">1</td>
-                        <td class="text-right row-total">R 0.00</td>
+                        <td contenteditable="true">EA</td>
+                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">1</td>
+                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">0.00</td>
+                        <td class="text-right row-total" contenteditable="true" oninput="markManualRow(this)">R 20000</td>
                         <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
                     </tr>
                     <tr>
@@ -578,8 +584,10 @@
                             <strong contenteditable="true">[Item 2 Title]</strong>
                             <span contenteditable="true">[Detailed specification and hardware inclusion notes]</span>
                         </td>
-                        <td class="text-right" contenteditable="true" oninput="calculateTotals()">1</td>
-                        <td class="text-right row-total">R 0.00</td>
+                        <td contenteditable="true">M</td>
+                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">1</td>
+                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">0.00</td>
+                        <td class="text-right row-total" contenteditable="true" oninput="markManualRow(this)">R 0,00</td>
                         <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
                     </tr>
                 </tbody>
@@ -608,15 +616,15 @@
             <div class="totals-table">
                 <div class="total-row">
                     <span>Subtotal</span>
-                    <span id="subtotal-val">R 0.00</span>
+                    <span id="subtotal-val" contenteditable="true" oninput="manualSubtotalOverride = true">R 0,00</span>
                 </div>
                 <div class="total-row">
                     <span>VAT @ 15%</span>
-                    <span id="vat-val">R 0.00</span>
+                    <span id="vat-val" contenteditable="true" oninput="manualVatOverride = true">R 0,00</span>
                 </div>
                 <div class="total-row final">
                     <span>TOTAL ZAR</span>
-                    <span id="total-val">R 0.00</span>
+                    <span id="total-val" contenteditable="true" oninput="manualGrandTotalOverride = true">R 0,00</span>
                 </div>
             </div>
         </div>
@@ -641,6 +649,10 @@
 </div>
 
 <script>
+    let manualSubtotalOverride = false;
+    let manualVatOverride = false;
+    let manualGrandTotalOverride = false;
+
     function checkPassword() {
         const input = document.getElementById('password-input').value;
         const errorDiv = document.getElementById('auth-error');
@@ -654,13 +666,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const unlockBtn = document.getElementById('unlock-btn');
         const passwordInput = document.getElementById('password-input');
-
-        if (unlockBtn) {
-            unlockBtn.addEventListener('click', checkPassword);
-        }
-
         if (passwordInput) {
             passwordInput.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
@@ -668,7 +674,13 @@
                 }
             });
         }
+        calculateTotals();
     });
+
+    function toggleScope() {
+        const scopeEl = document.getElementById('scope-section-wrapper');
+        scopeEl.style.display = scopeEl.style.display === 'none' ? 'block' : 'none';
+    }
 
     function toggleItemsSection() {
         const itemsEl = document.getElementById('items-section-wrapper');
@@ -686,7 +698,33 @@
     }
 
     function formatCurrency(amount) {
-        return 'R ' + amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const parts = amount.toFixed(2).split('.');
+        const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        return 'R ' + integerPart + ',' + parts[1];
+    }
+
+    function parseZAR(text) {
+        if (!text) return 0;
+        let clean = text.replace(/[^0-9,-]/g, '');
+        clean = clean.replace(',', '.');
+        return parseFloat(clean) || 0;
+    }
+
+    function markManualRow(cell) {
+        cell.dataset.manual = "true";
+        manualGrandTotalOverride = false;
+        calculateTotals();
+    }
+
+    function onQtyOrPriceInput(cell) {
+        const row = cell.closest('tr');
+        const totalCell = row.querySelector('.row-total');
+        if (totalCell) {
+            // Remove manual flag so it goes back to calculating automatically when Qty or Unit Price are changed
+            delete totalCell.dataset.manual;
+        }
+        manualGrandTotalOverride = false;
+        calculateTotals();
     }
 
     function calculateTotals() {
@@ -694,24 +732,36 @@
         let subtotal = 0;
 
         rows.forEach(row => {
-            const qtyCell = row.cells[1];
-            const totalCell = row.cells[2];
+            const qtyCell = row.cells[2];
+            const upCell = row.cells[3];
+            const totalCell = row.cells[4];
 
-            if (qtyCell && totalCell) {
-                const qty = parseFloat(qtyCell.innerText.replace(/[^0-9.-]+/g,"")) || 0;
-                const rowTotal = qty; 
+            if (qtyCell && upCell && totalCell) {
+                const qty = parseZAR(qtyCell.innerText);
+                const unitPrice = parseZAR(upCell.innerText);
 
-                totalCell.innerText = formatCurrency(rowTotal);
-                subtotal += rowTotal;
+                if (totalCell.dataset.manual !== "true") {
+                    const rowTotal = qty * unitPrice;
+                    totalCell.innerText = formatCurrency(rowTotal);
+                    subtotal += rowTotal;
+                } else {
+                    subtotal += parseZAR(totalCell.innerText);
+                }
             }
         });
 
         const vat = subtotal * 0.15;
         const grandTotal = subtotal + vat;
 
-        document.getElementById('subtotal-val').innerText = formatCurrency(subtotal);
-        document.getElementById('vat-val').innerText = formatCurrency(vat);
-        document.getElementById('total-val').innerText = formatCurrency(grandTotal);
+        if (!manualSubtotalOverride) {
+            document.getElementById('subtotal-val').innerText = formatCurrency(subtotal);
+        }
+        if (!manualVatOverride) {
+            document.getElementById('vat-val').innerText = formatCurrency(vat);
+        }
+        if (!manualGrandTotalOverride) {
+            document.getElementById('total-val').innerText = formatCurrency(grandTotal);
+        }
     }
 
     function addNewRow() {
@@ -722,25 +772,36 @@
                 <strong contenteditable="true">[New Item Title]</strong>
                 <span contenteditable="true">[Detailed specification notes]</span>
             </td>
-            <td class="text-right" contenteditable="true" oninput="calculateTotals()">0.00</td>
-            <td class="text-right row-total">R 0.00</td>
+            <td contenteditable="true">EA</td>
+            <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">1</td>
+            <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">0,00</td>
+            <td class="text-right row-total" contenteditable="true" oninput="markManualRow(this)">R 0,00</td>
             <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
         `;
         tbody.appendChild(newRow);
+        manualGrandTotalOverride = false;
         calculateTotals();
     }
 
     function deleteRow(button) {
         const row = button.closest('tr');
         row.remove();
+        manualGrandTotalOverride = false;
         calculateTotals();
     }
 
     function clearAllRows() {
         if (confirm("Are you sure you want to clear all line items?")) {
             document.getElementById('line-items').innerHTML = '';
+            manualSubtotalOverride = false;
+            manualVatOverride = false;
+            manualGrandTotalOverride = false;
             calculateTotals();
         }
+    }
+
+    function resetForm() {
+        location.reload();
     }
 
     function addReportCard() {
@@ -762,10 +823,6 @@
             item.remove();
         }
     }
-
-    window.onload = function() {
-        calculateTotals();
-    };
 </script>
 
 </body>
