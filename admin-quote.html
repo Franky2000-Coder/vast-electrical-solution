@@ -111,10 +111,10 @@
             background-color: #B87333;
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             border-radius: 4px;
             cursor: pointer;
             transition: opacity 0.2s ease;
@@ -282,11 +282,6 @@
             margin-bottom: 15px;
         }
 
-        .project-scope-card p {
-            font-size: 0.75rem;
-            color: #333333;
-        }
-
         /* Items Table */
         .table-container {
             margin-bottom: 15px;
@@ -404,22 +399,29 @@
         .signoff-section {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-start;
             border-top: 1px solid #DDDDDD;
             padding-top: 20px;
             font-size: 0.75rem;
+            gap: 20px;
         }
 
-        .client-acceptance p {
+        .signature-block {
+            flex: 1;
+        }
+
+        .signature-block p.title {
             font-weight: 700;
             color: #111111;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .signature-line {
-            width: 250px;
+            width: 100%;
+            max-width: 240px;
             border-bottom: 1px solid #666666;
             margin-bottom: 4px;
+            height: 25px;
         }
 
         .issued-box {
@@ -442,8 +444,48 @@
             letter-spacing: 0.3px;
         }
 
+        /* Modal for Archive */
+        #archive-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .archive-content {
+            background: #181818;
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            color: #fff;
+        }
+        .archive-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 0.85rem;
+        }
+        .archive-item button {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+
         @media print {
-            #auth-overlay, .controls-bar, .btn-delete, .btn-add {
+            #auth-overlay, #archive-modal, .controls-bar, .btn-delete, .btn-add, .clear-sig-btn {
                 display: none !important;
             }
             body {
@@ -475,16 +517,36 @@
     </div>
 </div>
 
+<!-- Archive Modal -->
+<div id="archive-modal">
+    <div class="archive-content">
+        <h3 style="color: #00E5FF; margin-bottom: 10px;">Saved Quote Archive</h3>
+        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">Search or select a quote to load and continue editing.</p>
+        
+        <!-- Search Bar with Input Listener & Enter Key Support -->
+        <input type="text" id="archive-search-input" placeholder="Search by Quote # or Client Name..." oninput="filterArchiveList()" onkeydown="handleArchiveKeydown(event)" style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #fff; font-size: 0.85rem; margin-bottom: 10px; outline: none;">
+
+        <div class="archive-list" id="archive-list-container">
+            <!-- Saved items injected dynamically -->
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <button class="btn-action btn-secondary" onclick="closeArchiveModal()">Close</button>
+            <button class="btn-action" onclick="saveQuoteToArchive()">Save Current Quote</button>
+        </div>
+    </div>
+</div>
+
 <!-- Control Bar -->
 <div class="controls-bar">
-    <p>💡 Click any UOM, Qty, Unit Price, or Total to edit. Totals auto-calculate or accept manual overrides!</p>
+    <p>💡 Click any field to edit. Data auto-syncs & saves locally!</p>
     <div class="button-group">
         <a href="index.html" class="btn-action btn-secondary">Home</a>
+        <button class="btn-action btn-secondary" onclick="openArchiveModal()">Archive / Load</button>
         <button class="btn-action btn-secondary" onclick="toggleScope()">Toggle Scope</button>
         <button class="btn-action btn-secondary" onclick="toggleItemsSection()">Toggle Items</button>
         <button class="btn-action btn-secondary" onclick="toggleBanking()">Toggle Banking</button>
         <button class="btn-action btn-secondary" onclick="toggleTotals()">Toggle Totals</button>
-        <button class="btn-action btn-secondary" onclick="resetForm()">Reset</button>
+        <button class="btn-action btn-secondary" onclick="resetForm()">New Quote</button>
         <button class="btn-action" onclick="window.print()">Print / Save PDF</button>
     </div>
 </div>
@@ -500,6 +562,7 @@
                 <h1 contenteditable="true">VAST ELECTRICAL SOLUTIONS</h1>
                 <h2 contenteditable="true">HIGH-END ELECTRICAL & RENEWABLE ENERGY ENGINEERING</h2>
                 <p contenteditable="true">Phone: +27 83 340 6875 | Email: vastelectricalsol@gmail.com</p>
+                <p contenteditable="true">Web: vastelectricalsolutions.co.za</p>
                 <p contenteditable="true">Region: Cape Province</p>
             </div>
         </div>
@@ -508,11 +571,11 @@
             <table class="meta-table">
                 <tr>
                     <td><strong>Quote No:</strong></td>
-                    <td><span contenteditable="true">VES-2026-0842</span></td>
+                    <td><span id="quote-no-display" contenteditable="true">VES-2026-103</span></td>
                 </tr>
                 <tr>
                     <td><strong>Date:</strong></td>
-                    <td><span contenteditable="true">August 18, 2026</span></td>
+                    <td><span id="quote-date-display" contenteditable="true">October 21, 2026</span></td>
                 </tr>
                 <tr>
                     <td><strong>Valid For:</strong></td>
@@ -526,7 +589,7 @@
     <div class="top-info-grid">
         <div class="blue-card">
             <div class="blue-card-title">Client & Installation Location</div>
-            <p><strong contenteditable="true">[CLIENT NAME]</strong></p>
+            <p><strong id="client-name-display" contenteditable="true">[CLIENT NAME]</strong></p>
             <p><span contenteditable="true">[STREET ADDRESS]</span></p>
             <p><span contenteditable="true">[CITY, POSTAL CODE]</span></p>
             <p><span contenteditable="true">Western Cape</span></p>
@@ -542,7 +605,7 @@
     <!-- Project Scope & Summary Card -->
     <div id="scope-section-wrapper" class="project-scope-card">
         <div class="blue-card-title" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>Project Scope & Summary</span>
+            <span contenteditable="true">Project Scope & Summary</span>
             <button class="btn-add" onclick="addReportCard()" style="padding: 2px 6px; font-size: 0.65rem;">+ Add Note Section</button>
         </div>
         <div id="report-sections" style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
@@ -579,17 +642,6 @@
                         <td class="text-right row-total" contenteditable="true" oninput="markManualRow(this)">R 20000</td>
                         <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
                     </tr>
-                    <tr>
-                        <td class="item-desc">
-                            <strong contenteditable="true">[Item 2 Title]</strong>
-                            <span contenteditable="true">[Detailed specification and hardware inclusion notes]</span>
-                        </td>
-                        <td contenteditable="true">M</td>
-                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">1</td>
-                        <td class="text-right" contenteditable="true" oninput="onQtyOrPriceInput(this)">0.00</td>
-                        <td class="text-right row-total" contenteditable="true" oninput="markManualRow(this)">R 0,00</td>
-                        <td class="text-right"><button class="btn-delete" onclick="deleteRow(this)" title="Remove item">✕</button></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -608,7 +660,7 @@
             <p><strong>Bank:</strong> Absa Bank</p>
             <p><strong>Account Name:</strong> Vast Electrical Solutions</p>
             <p><strong>Account Number:</strong> 4117262414 | <strong>Branch Code:</strong> 632005</p>
-            <p><strong>Reference:</strong> [QUOTE NO] / [CLIENT SURNAME]</p>
+            <p><strong>Reference:</strong> <span id="banking-quote-ref">VES-2026-103</span> / <span id="banking-client-ref">CLIENT SURNAME</span></p>
             <p style="margin-top: 6px; font-size: 0.7rem; color: #555555;">• 50% deposit required on acceptance; balance on completion.<br>• 12-month installation & workmanship guarantee included.</p>
         </div>
 
@@ -632,19 +684,26 @@
 
     <!-- Sign-off Section -->
     <div class="signoff-section">
-        <div class="client-acceptance">
-            <p contenteditable="true">Client Acceptance Signature:</p>
+        <div class="signature-block">
+            <p class="title" contenteditable="true">Client Acceptance Signature:</p>
             <div class="signature-line"></div>
-            <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 4px;">Date: ________________________</p>
+            <button class="btn-add clear-sig-btn" onclick="clearSignature(this)" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">Clear Signature Line</button>
+            <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 6px;">Date: ________________________</p>
+        </div>
+        <div class="signature-block">
+            <p class="title" contenteditable="true">Electrician Signature:</p>
+            <div class="signature-line"></div>
+            <button class="btn-add clear-sig-btn" onclick="clearSignature(this)" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">Clear Signature Line</button>
+            <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 6px;">Date: ________________________</p>
         </div>
         <div class="issued-box">
             <p contenteditable="true"><strong>Issued By:</strong> Vast Electrical Solutions</p>
-            <p contenteditable="true">Master Electrician / Solar Specialist</p>
+            <p contenteditable="true">Principal Electrician / Solar Specialist</p>
         </div>
     </div>
 
     <div class="footer-banner" contenteditable="true">
-        Vast Electrical Solutions • Certified High-Quality Installations & Renewable Energy Engineering • Cape Province
+        Vast Electrical Solutions • Certified High-Quality Installations & Renewable Energy Engineering • Cape Province • Web: vastelectricalsolutions.co.za
     </div>
 </div>
 
@@ -674,8 +733,181 @@
                 }
             });
         }
+
+        // Auto set current date if not loaded from archive
+        const dateSpan = document.getElementById('quote-date-display');
+        if(dateSpan && !dateSpan.dataset.loaded) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            dateSpan.innerText = new Date().toLocaleDateString('en-US', options);
+        }
+
+        // Auto increment / assign quote number if first time
+        const quoteNoSpan = document.getElementById('quote-no-display');
+        if(quoteNoSpan && !localStorage.getItem('ves_last_quote_no')) {
+            localStorage.setItem('ves_last_quote_no', 'VES-2026-103');
+            quoteNoSpan.innerText = 'VES-2026-103';
+        } else if(quoteNoSpan && !quoteNoSpan.dataset.loaded) {
+            let lastNo = localStorage.getItem('ves_last_quote_no') || 'VES-2026-102';
+            let parts = lastNo.split('-');
+            let num = parseInt(parts[parts.length - 1]) + 1;
+            parts[parts.length - 1] = String(num).padStart(3, '0');
+            let nextNo = parts.join('-');
+            quoteNoSpan.innerText = nextNo;
+            localStorage.setItem('ves_last_quote_no', nextNo);
+        }
+
+        setupLiveSync();
+        syncBankingReferences(); // Forces immediate sync on load
         calculateTotals();
     });
+
+    function setupLiveSync() {
+        const quoteNoDisplay = document.getElementById('quote-no-display');
+        const clientNameDisplay = document.getElementById('client-name-display');
+
+        if(quoteNoDisplay) {
+            quoteNoDisplay.addEventListener('input', syncBankingReferences);
+            quoteNoDisplay.addEventListener('blur', syncBankingReferences);
+        }
+
+        if(clientNameDisplay) {
+            clientNameDisplay.addEventListener('input', syncBankingReferences);
+            clientNameDisplay.addEventListener('blur', syncBankingReferences);
+        }
+    }
+
+    function syncBankingReferences() {
+        const quoteNoDisplay = document.getElementById('quote-no-display');
+        const clientNameDisplay = document.getElementById('client-name-display');
+        const bankingQuoteRef = document.getElementById('banking-quote-ref');
+        const bankingClientRef = document.getElementById('banking-client-ref');
+
+        if (quoteNoDisplay && bankingQuoteRef) {
+            bankingQuoteRef.innerText = quoteNoDisplay.innerText.trim();
+        }
+
+        if (clientNameDisplay && bankingClientRef) {
+            let name = clientNameDisplay.innerText.trim();
+            let surname = name.split(' ').pop() || 'CLIENT SURNAME';
+            bankingClientRef.innerText = surname.toUpperCase();
+        }
+    }
+
+    // Archive & Local Storage Functions
+    function openArchiveModal() {
+        document.getElementById('archive-modal').style.display = 'flex';
+        renderArchiveList();
+    }
+
+    function closeArchiveModal() {
+        document.getElementById('archive-modal').style.display = 'none';
+    }
+
+    function saveQuoteToArchive() {
+        const quoteNo = document.getElementById('quote-no-display').innerText.trim() || 'VES-Draft';
+        const clientName = document.getElementById('client-name-display').innerText.trim() || 'Unnamed Client';
+        const dateStr = document.getElementById('quote-date-display').innerText.trim();
+        
+        const quoteData = {
+            quoteNo,
+            clientName,
+            dateStr,
+            htmlContent: document.querySelector('.quote-container').innerHTML
+        };
+
+        let archive = JSON.parse(localStorage.getItem('ves_quote_archive') || '[]');
+        let existingIndex = archive.findIndex(q => q.quoteNo === quoteNo);
+        if(existingIndex >= 0) {
+            archive[existingIndex] = quoteData;
+        } else {
+            archive.unshift(quoteData);
+        }
+
+        localStorage.setItem('ves_quote_archive', JSON.stringify(archive));
+        alert('Quote successfully saved to archive!');
+        renderArchiveList();
+    }
+
+    function renderArchiveList(filterText = "") {
+        const container = document.getElementById('archive-list-container');
+        let archive = JSON.parse(localStorage.getItem('ves_quote_archive') || '[]');
+        
+        if(archive.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#777; padding:15px;">No saved quotes found.</p>';
+            return;
+        }
+
+        let search = filterText.toLowerCase().trim();
+        let filteredArchive = archive.map((item, originalIndex) => ({ item, originalIndex })).filter(({ item }) => {
+            if(!search) return true;
+            return item.quoteNo.toLowerCase().includes(search) || item.clientName.toLowerCase().includes(search);
+        });
+
+        if(filteredArchive.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#777; padding:15px;">No matching quotes found.</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        filteredArchive.forEach(({ item, originalIndex }) => {
+            const div = document.createElement('div');
+            div.className = 'archive-item';
+            div.innerHTML = `
+                <span><strong>${item.quoteNo}</strong> - ${item.clientName} (${item.dateStr})</span>
+                <div>
+                    <button class="btn-action" onclick="loadArchivedQuote(${originalIndex})" style="padding:4px 8px; font-size:0.65rem;">Load</button>
+                    <button class="btn-action btn-secondary" onclick="deleteArchivedQuote(${originalIndex})" style="padding:4px 8px; font-size:0.65rem; background:#cc0000;">Del</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function filterArchiveList() {
+        const query = document.getElementById('archive-search-input').value;
+        renderArchiveList(query);
+    }
+
+    function handleArchiveKeydown(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const container = document.getElementById('archive-list-container');
+            const loadButtons = container.querySelectorAll('button.btn-action');
+            if (loadButtons.length === 1) {
+                loadButtons[0].click();
+            }
+        }
+    }
+
+    function loadArchivedQuote(index) {
+        let archive = JSON.parse(localStorage.getItem('ves_quote_archive') || '[]');
+        if(archive[index]) {
+            const item = archive[index];
+            document.querySelector('.quote-container').innerHTML = item.htmlContent;
+            
+            document.getElementById('quote-date-display').dataset.loaded = "true";
+            document.getElementById('quote-no-display').dataset.loaded = "true";
+
+            setupLiveSync();
+            syncBankingReferences();
+            calculateTotals();
+            closeArchiveModal();
+            alert(`Loaded quote ${item.quoteNo} successfully!`);
+        }
+    }
+
+    function deleteArchivedQuote(index) {
+        if(confirm('Are you sure you want to delete this saved quote?')) {
+            let archive = JSON.parse(localStorage.getItem('ves_quote_archive') || '[]');
+            archive.splice(index, 1);
+            localStorage.setItem('ves_quote_archive', JSON.stringify(archive));
+            renderArchiveList();
+        }
+    }
+
+    function clearSignature(btn) {
+        alert('Signature line cleared.');
+    }
 
     function toggleScope() {
         const scopeEl = document.getElementById('scope-section-wrapper');
@@ -720,7 +952,6 @@
         const row = cell.closest('tr');
         const totalCell = row.querySelector('.row-total');
         if (totalCell) {
-            // Remove manual flag so it goes back to calculating automatically when Qty or Unit Price are changed
             delete totalCell.dataset.manual;
         }
         manualGrandTotalOverride = false;
