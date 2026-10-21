@@ -485,7 +485,7 @@
         }
 
         @media print {
-            #auth-overlay, #archive-modal, .controls-bar, .btn-delete, .btn-add, .clear-sig-btn {
+            #auth-overlay, #archive-modal, .controls-bar, .btn-delete, .btn-add {
                 display: none !important;
             }
             body {
@@ -546,6 +546,7 @@
         <button class="btn-action btn-secondary" onclick="toggleItemsSection()">Toggle Items</button>
         <button class="btn-action btn-secondary" onclick="toggleBanking()">Toggle Banking</button>
         <button class="btn-action btn-secondary" onclick="toggleTotals()">Toggle Totals</button>
+        <button class="btn-action btn-secondary" onclick="toggleClientSignature()">Toggle Client Sig</button>
         <button class="btn-action btn-secondary" onclick="resetForm()">New Quote</button>
         <button class="btn-action" onclick="window.print()">Print / Save PDF</button>
     </div>
@@ -684,16 +685,14 @@
 
     <!-- Sign-off Section -->
     <div class="signoff-section">
-        <div class="signature-block">
+        <div id="client-signature-wrapper" class="signature-block">
             <p class="title" contenteditable="true">Client Acceptance Signature:</p>
             <div class="signature-line"></div>
-            <button class="btn-add clear-sig-btn" onclick="clearSignature(this)" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">Clear Signature Line</button>
             <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 6px;">Date: ________________________</p>
         </div>
         <div class="signature-block">
             <p class="title" contenteditable="true">Electrician Signature:</p>
             <div class="signature-line"></div>
-            <button class="btn-add clear-sig-btn" onclick="clearSignature(this)" style="font-size: 0.65rem; padding: 2px 6px; margin-top: 2px;">Clear Signature Line</button>
             <p contenteditable="true" style="font-weight: 400; font-size: 0.7rem; color: #666666; margin-top: 6px;">Date: ________________________</p>
         </div>
         <div class="issued-box">
@@ -905,10 +904,6 @@
         }
     }
 
-    function clearSignature(btn) {
-        alert('Signature line cleared.');
-    }
-
     function toggleScope() {
         const scopeEl = document.getElementById('scope-section-wrapper');
         scopeEl.style.display = scopeEl.style.display === 'none' ? 'block' : 'none';
@@ -927,6 +922,11 @@
     function toggleTotals() {
         const totalsEl = document.getElementById('totals-section');
         totalsEl.style.display = totalsEl.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleClientSignature() {
+        const sigEl = document.getElementById('client-signature-wrapper');
+        sigEl.style.display = sigEl.style.display === 'none' ? 'block' : 'none';
     }
 
     function formatCurrency(amount) {
