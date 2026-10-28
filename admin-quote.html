@@ -510,10 +510,11 @@
 <div id="auth-overlay">
     <div class="auth-box">
         <h2>Restricted Access</h2>
-        <p>Enter admin password to unlock tool.</p>
-        <input type="password" id="password-input" placeholder="Password" autofocus>
-        <div id="auth-error" class="auth-error">Incorrect password. Access denied.</div>
-        <button onclick="checkPassword()" class="btn-action" style="width: 100%;">Unlock Tool</button>
+        <p>Enter your authorized email & password to unlock tool.</p>
+        <input type="email" id="email-input" placeholder="Email Address" autofocus>
+        <input type="password" id="password-input" placeholder="Password">
+        <div id="auth-error" class="auth-error">Incorrect email or password. Access denied.</div>
+        <button onclick="checkCredentials()" class="btn-action" style="width: 100%;">Unlock Tool</button>
     </div>
 </div>
 
@@ -711,12 +712,16 @@
     let manualVatOverride = false;
     let manualGrandTotalOverride = false;
 
-    function checkPassword() {
-        const input = document.getElementById('password-input').value;
+    function checkCredentials() {
+        const emailInput = document.getElementById('email-input').value.trim().toLowerCase();
+        const passwordInput = document.getElementById('password-input').value;
         const errorDiv = document.getElementById('auth-error');
         const overlay = document.getElementById('auth-overlay');
 
-        if (input === "Vast2026!") {
+        const allowedEmail = "coetzerfranco0@gmail.com";
+        const allowedPassword = "Vast2026!";
+
+        if (emailInput === allowedEmail && passwordInput === allowedPassword) {
             overlay.style.display = 'none';
         } else {
             errorDiv.style.display = 'block';
@@ -725,13 +730,16 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const passwordInput = document.getElementById('password-input');
-        if (passwordInput) {
-            passwordInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    checkPassword();
-                }
-            });
-        }
+        const emailInput = document.getElementById('email-input');
+
+        const handleKeypress = function(event) {
+            if (event.key === 'Enter') {
+                checkCredentials();
+            }
+        };
+
+        if (passwordInput) passwordInput.addEventListener('keypress', handleKeypress);
+        if (emailInput) emailInput.addEventListener('keypress', handleKeypress);
 
         // Auto set current date if not loaded from archive
         const dateSpan = document.getElementById('quote-date-display');
